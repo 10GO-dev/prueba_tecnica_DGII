@@ -20,5 +20,24 @@ namespace PruebaTecnica.DGII.Controllers
         {
             return Ok(_data);
         }
+
+        [HttpGet("{rncCedula}/comprobantes")]
+        public ActionResult GetComprobantes(string rncCedula)
+        {
+            // Sample comprobantes list (would be moved to repository in a later commit)
+            var comprobantes = new List<PruebaTecnica.DGII.Models.ComprobanteFiscal>
+            {
+                new PruebaTecnica.DGII.Models.ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000001", Monto = 200.00m },
+                new PruebaTecnica.DGII.Models.ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000002", Monto = 1000.00m },
+                new PruebaTecnica.DGII.Models.ComprobanteFiscal { RncCedula = "123456789", NCF = "E310000000003", Monto = 500.00m }
+            };
+
+            var list = comprobantes.Where(c => c.RncCedula == rncCedula).ToList();
+            if (!list.Any()) return NotFound(new { message = "Contribuyente no encontrado o sin comprobantes" });
+
+            var totalItbis = Math.Round(list.Sum(x => x.Itbis18), 2);
+
+            return Ok(new { comprobantes = list, totalItbis });
+        }
     }
 }
