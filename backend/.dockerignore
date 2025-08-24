@@ -1,0 +1,6 @@
+bin/
+obj/
+.vs/
+*.db
+node_modules/
+**/PruebaTecnica.DGII.Tests
