@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.DGII.Models;
+using PruebaTecnica.DGII.Services;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System;
 
 namespace PruebaTecnica.DGII.Controllers
 {
@@ -8,17 +11,28 @@ namespace PruebaTecnica.DGII.Controllers
     [Route("api/[controller]")]
     public class ComprobantesController : ControllerBase
     {
-        private static readonly List<ComprobanteFiscal> _comprobantes = new()
+        private readonly ComprobanteService _service;
+        private readonly ILogger<ComprobantesController> _logger;
+
+        public ComprobantesController(ComprobanteService service, ILogger<ComprobantesController> logger)
         {
-            new ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000001", Monto = 200.00m },
-            new ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000002", Monto = 1000.00m },
-            new ComprobanteFiscal { RncCedula = "123456789", NCF = "E310000000003", Monto = 500.00m }
-        };
+            _service = service;
+            _logger = logger;
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<ComprobanteFiscal>> Get()
         {
-            return Ok(_comprobantes);
+            try
+            {
+                var data = _service.GetAll();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving comprobantes");
+                return StatusCode(500, new { message = "Error interno" });
+            }
         }
     }
 }

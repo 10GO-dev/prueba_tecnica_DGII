@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using PruebaTecnica.DGII.Models;
+using PruebaTecnica.DGII.Services;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System;
 
 namespace PruebaTecnica.DGII.Controllers
 {
@@ -8,36 +11,50 @@ namespace PruebaTecnica.DGII.Controllers
     [Route("api/[controller]")]
     public class ContribuyentesController : ControllerBase
     {
-        // Sample in-memory data for initial feature
-        private static readonly List<Contribuyente> _data = new()
+        private readonly ContribuyenteService _service;
+        private readonly ComprobanteService _comprobanteService;
+        private readonly ILogger<ContribuyentesController> _logger;
+
+        public ContribuyentesController(ContribuyenteService service, ComprobanteService comprobanteService, ILogger<ContribuyentesController> logger)
         {
-            new Contribuyente { RncCedula = "98754321012", Nombre = "JUAN PEREZ", Tipo = "PERSONA FISICA", Estatus = "activo" },
-            new Contribuyente { RncCedula = "123456789", Nombre = "FARMACIA TU SALUD", Tipo = "PERSONA JURIDICA", Estatus = "inactivo" }
-        };
+            _service = service;
+            _comprobanteService = comprobanteService;
+            _logger = logger;
+        }
 
         [HttpGet]
         public ActionResult<IEnumerable<Contribuyente>> Get()
         {
-            return Ok(_data);
+            try
+            {
+                var data = _service.GetAll();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving contribuyentes");
+                return StatusCode(500, new { message = "Error interno" });
+            }
         }
 
         [HttpGet("{rncCedula}/comprobantes")]
         public ActionResult GetComprobantes(string rncCedula)
         {
-            // Sample comprobantes list (would be moved to repository in a later commit)
-            var comprobantes = new List<PruebaTecnica.DGII.Models.ComprobanteFiscal>
+            try
             {
-                new PruebaTecnica.DGII.Models.ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000001", Monto = 200.00m },
-                new PruebaTecnica.DGII.Models.ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000002", Monto = 1000.00m },
-                new PruebaTecnica.DGII.Models.ComprobanteFiscal { RncCedula = "123456789", NCF = "E310000000003", Monto = 500.00m }
-            };
+                var contrib = _service.GetByRnc(rncCedula);
+                if (contrib == null) return NotFound(new { message = "Contribuyente no encontrado" });
 
-            var list = comprobantes.Where(c => c.RncCedula == rncCedula).ToList();
-            if (!list.Any()) return NotFound(new { message = "Contribuyente no encontrado o sin comprobantes" });
+                var list = _comprobanteService.GetByRnc(rncCedula).ToList();
+                var totalItbis = Math.Round(list.Sum(x => x.Itbis18), 2);
 
-            var totalItbis = Math.Round(list.Sum(x => x.Itbis18), 2);
-
-            return Ok(new { comprobantes = list, totalItbis });
+                return Ok(new { contribuyente = contrib, comprobantes = list, totalItbis });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving comprobantes for {rnc}", rncCedula);
+                return StatusCode(500, new { message = "Error interno" });
+            }
         }
     }
 }
