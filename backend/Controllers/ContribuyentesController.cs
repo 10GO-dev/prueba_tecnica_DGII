@@ -3,6 +3,7 @@ using PruebaTecnica.DGII.Models;
 using PruebaTecnica.DGII.Services;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System;
 
 namespace PruebaTecnica.DGII.Controllers
