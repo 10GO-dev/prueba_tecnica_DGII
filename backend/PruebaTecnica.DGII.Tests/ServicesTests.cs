@@ -1,15 +1,46 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using PruebaTecnica.DGII.Data;
 using PruebaTecnica.DGII.Repositories;
 using PruebaTecnica.DGII.Services;
+using PruebaTecnica.DGII.Models;
 using Xunit;
 
 namespace PruebaTecnica.DGII.Tests
 {
     public class ServicesTests
     {
-        [Fact]
-        public void ContribuyenteService_GetAll_ReturnsTwo()
+        private PruebaTecnicaContext CreateInMemoryContext()
         {
-            var repo = new InMemoryContribuyenteRepository();
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+            var options = new DbContextOptionsBuilder<PruebaTecnicaContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            var ctx = new PruebaTecnicaContext(options);
+            ctx.Database.EnsureCreated();
+
+            // seed
+            ctx.Contribuyentes.AddRange(
+                new Contribuyente { RncCedula = "98754321012", Nombre = "JUAN PEREZ", Tipo = "PERSONA FISICA", Estatus = "activo" },
+                new Contribuyente { RncCedula = "123456789", Nombre = "FARMACIA TU SALUD", Tipo = "PERSONA JURIDICA", Estatus = "inactivo" }
+            );
+            ctx.Comprobantes.AddRange(
+                new ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000001", Monto = 200.00m },
+                new ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000002", Monto = 1000.00m },
+                new ComprobanteFiscal { RncCedula = "123456789", NCF = "E310000000003", Monto = 500.00m }
+            );
+            ctx.SaveChanges();
+
+            return ctx;
+        }
+
+        [Fact]
+        public void ContribuyenteService_GetAll_ReturnsNotEmpty()
+        {
+            using var ctx = CreateInMemoryContext();
+            var repo = new ContribuyenteRepository(ctx);
             var service = new ContribuyenteService(repo);
 
             var all = service.GetAll();
@@ -21,7 +52,8 @@ namespace PruebaTecnica.DGII.Tests
         [Fact]
         public void ComprobanteService_GetTotalItbis_CalculatesCorrectly()
         {
-            var repo = new InMemoryComprobanteRepository();
+            using var ctx = CreateInMemoryContext();
+            var repo = new ComprobanteRepository(ctx);
             var service = new ComprobanteService(repo);
 
             var total = service.GetTotalItbis("98754321012");
