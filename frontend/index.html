@@ -4,6 +4,25 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Prueba DGII</title>
+    <style>
+      /* Minimal fallback styles while Tailwind/PostCSS aren't installed */
+      :root{--bg:#f8fafc;--card:#ffffff;--muted:#6b7280;--accent:#2563eb}
+      html,body,#root{height:100%;}
+      body{margin:0;padding:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; color:#0f172a}
+      .container{max-width:1100px;margin:28px auto;padding:16px}
+      .panel{background:var(--card);border-radius:8px;box-shadow:0 1px 3px rgba(2,6,23,0.06);padding:16px}
+      h3,h4{margin:0 0 8px 0}
+      ul{padding:0;margin:0 0 12px 0;list-style:none}
+      li{margin-bottom:8px}
+      button{cursor:pointer}
+      .btn{background:var(--accent);color:white;border:none;padding:8px 10px;border-radius:6px}
+      input, select, textarea{padding:6px;border-radius:6px;border:1px solid #e6eef6}
+      .muted{color:var(--muted)}
+      table{width:100%;border-collapse:collapse;margin-top:8px}
+      th,td{padding:8px;border-bottom:1px solid #eef2f7;text-align:left}
+      .msg{color:green}
+      .err{color:#dc2626}
+    </style>
   </head>
   <body>
     <div id="root"></div>
