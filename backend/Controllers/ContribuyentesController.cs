@@ -57,5 +57,29 @@ namespace PruebaTecnica.DGII.Controllers
                 return StatusCode(500, new { message = "Error interno" });
             }
         }
+
+        [HttpPost]
+        public ActionResult Create([FromBody] Contribuyente contrib)
+        {
+            try
+            {
+                if (contrib == null) return BadRequest(new { message = "Payload inválido" });
+
+                // basic validation
+                if (string.IsNullOrWhiteSpace(contrib.RncCedula) || string.IsNullOrWhiteSpace(contrib.Nombre))
+                    return BadRequest(new { message = "RncCedula y Nombre son requeridos" });
+
+                var exists = _service.GetByRnc(contrib.RncCedula);
+                if (exists != null) return Conflict(new { message = "Contribuyente ya existe" });
+
+                _service.Add(contrib);
+                return CreatedAtAction(nameof(GetComprobantes), new { rncCedula = contrib.RncCedula }, contrib);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating contribuyente");
+                return StatusCode(500, new { message = "Error interno" });
+            }
+        }
     }
 }

@@ -14,5 +14,11 @@ namespace PruebaTecnica.DGII.Repositories
         public IEnumerable<Contribuyente> GetAll() => _context.Contribuyentes.ToList();
 
         public Contribuyente? GetByRnc(string rncCedula) => _context.Contribuyentes.Find(rncCedula);
+        
+        public void Add(Contribuyente contribuyente)
+        {
+            _context.Contribuyentes.Add(contribuyente);
+            _context.SaveChanges();
+        }
     }
 }

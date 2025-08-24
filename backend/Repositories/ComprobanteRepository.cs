@@ -17,5 +17,11 @@ namespace PruebaTecnica.DGII.Repositories
         {
             return _context.Comprobantes.Where(c => c.RncCedula == rncCedula).ToList();
         }
+
+        public void Add(ComprobanteFiscal comprobante)
+        {
+            _context.Comprobantes.Add(comprobante);
+            _context.SaveChanges();
+        }
     }
 }

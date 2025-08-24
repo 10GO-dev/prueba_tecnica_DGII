@@ -7,5 +7,6 @@ namespace PruebaTecnica.DGII.Interfaces
     {
         IEnumerable<Contribuyente> GetAll();
         Contribuyente? GetByRnc(string rncCedula);
+    void Add(Contribuyente contribuyente);
     }
 }

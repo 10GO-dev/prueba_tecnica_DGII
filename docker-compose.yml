@@ -7,10 +7,10 @@ services:
     ports:
       - "5000:5000"
     volumes:
-  - db_data:/data
+      - db_data:/data
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-  - ConnectionStrings__Default=Data Source=/data/prueba_tecnica.db
+      - ConnectionStrings__Default=Data Source=/data/prueba_tecnica.db
 
   frontend:
     build:

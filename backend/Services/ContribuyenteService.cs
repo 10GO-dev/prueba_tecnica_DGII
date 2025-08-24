@@ -16,5 +16,10 @@ namespace PruebaTecnica.DGII.Services
         public IEnumerable<Contribuyente> GetAll() => _repo.GetAll();
 
         public Contribuyente? GetByRnc(string rnc) => _repo.GetByRnc(rnc);
+        
+        public void Add(Contribuyente contrib)
+        {
+            _repo.Add(contrib);
+        }
     }
 }
