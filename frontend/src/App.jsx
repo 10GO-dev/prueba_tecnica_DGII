@@ -15,7 +15,6 @@ export default function App() {
   const [compNcf, setCompNcf] = useState('')
   const [compMonto, setCompMonto] = useState('')
   const [compItbis, setCompItbis] = useState('')
-  const [compRnc, setCompRnc] = useState('')
 
   const [message, setMessage] = useState(null)
   const [error, setError] = useState(null)
@@ -58,8 +57,8 @@ export default function App() {
     e.preventDefault()
     setMessage(null); setError(null)
     try {
-      const targetRnc = compRnc || selected?.rncCedula
-      if (!targetRnc) { setError('Seleccione o indique el RNC/Cédula para el comprobante'); return }
+      const targetRnc = selected?.rncCedula
+      if (!targetRnc) { setError('Debe seleccionar un contribuyente antes de crear un comprobante'); return }
       const payload = { ncf: compNcf, monto: parseFloat(compMonto) || 0, itbis18: parseFloat(compItbis) || 0, rncCedula: targetRnc }
       await axios.post('/api/comprobantes', payload)
       setMessage('Comprobante creado')
@@ -126,16 +125,22 @@ export default function App() {
             <h4 className="mt-6 text-sm font-medium">Añadir comprobante</h4>
             <form onSubmit={createComprobante} className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 max-w-lg">
               <input className="w-full border rounded px-2 py-1" placeholder="NCF" value={compNcf} onChange={e => setCompNcf(e.target.value)} />
-              <input className="w-full border rounded px-2 py-1" placeholder="Monto" value={compMonto} onChange={e => setCompMonto(e.target.value)} />
-              <input className="w-full border rounded px-2 py-1" placeholder="ITBIS (18%)" value={compItbis} onChange={e => setCompItbis(e.target.value)} />
-              <select className="w-full border rounded px-2 py-1" value={compRnc} onChange={e => setCompRnc(e.target.value)}>
-                <option value="">-- Usar contribuyente seleccionado --</option>
-                {contribuyentes.map(c => (
-                  <option key={c.rncCedula} value={c.rncCedula}>{c.nombre} ({c.rncCedula})</option>
-                ))}
-              </select>
+              <input className="w-full border rounded px-2 py-1" placeholder="Monto" value={compMonto} onChange={e => {
+                const v = e.target.value
+                setCompMonto(v)
+                const num = parseFloat(v) || 0
+                // calculate 18% ITBIS and round to 2 decimals
+                setCompItbis((Math.round((num * 0.18) * 100) / 100).toFixed(2))
+              }} />
+              <input className="w-full border rounded px-2 py-1 bg-gray-50" placeholder="ITBIS (18%)" value={compItbis} readOnly />
+              {/* show selected contrib info or hint */}
+              {selected ? (
+                <div className="w-full text-sm text-gray-700 py-2">Creando comprobante para: <strong>{selected.nombre}</strong> <span className="text-gray-500">({selected.rncCedula})</span></div>
+              ) : (
+                <div className="w-full text-sm text-red-600 py-2">Seleccione un contribuyente para habilitar el formulario</div>
+              )}
               <div className="col-span-1 md:col-span-2">
-                <button className="bg-green-600 text-white rounded px-3 py-1" type="submit">Crear comprobante</button>
+                <button className={`rounded px-3 py-1 text-white ${selected ? 'bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`} type="submit" disabled={!selected}>Crear comprobante</button>
               </div>
             </form>
           </div>
