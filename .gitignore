@@ -6,3 +6,8 @@ obj/
 /.vscode/
 node_modules/
 dist/
+
+# SQLite DB files (don't commit local database files)
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
