@@ -7,10 +7,12 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - db_data:/data
+      - ./backend/prueba_tecnica.db:/data/prueba_tecnica.db
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__Default=Data Source=/data/prueba_tecnica.db
+    restart: unless-stopped
 
   frontend:
     build:
@@ -18,7 +20,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
-volumes:
-  db_data:
-    driver: local
+volumes: {}
