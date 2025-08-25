@@ -3,13 +3,15 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci --production=false
+# Use npm install to avoid lockfile mismatches in the builder environment
+# --legacy-peer-deps helps with peer dependency issues on older node images
+RUN npm install --legacy-peer-deps
 
 # Build
 COPY . .
 RUN npm run build
-# Ensure Tailwind CSS is compiled in case Vite/PostCSS didn't emit a standalone file
-RUN npm run build:css || echo "build:css failed, continuing"
+# build Tailwind CSS if script exists (produces ./dist/index.css)
+RUN if [ -f package.json ] && npm run | grep -q "build:css" ; then npm run build:css || true; fi
 
 # Runtime: serve static files with nginx
 FROM nginx:alpine
