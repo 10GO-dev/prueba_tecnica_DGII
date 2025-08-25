@@ -1,4 +1,5 @@
 import React from 'react'
+import { ITBIS_RATE } from '../constants'
 import PropTypes from 'prop-types'
 
 export default function ComprobanteForm({ onSubmit, values, setters, disabled, selected }) {
@@ -13,10 +14,11 @@ export default function ComprobanteForm({ onSubmit, values, setters, disabled, s
         <input className="w-full border rounded px-2 py-1" placeholder="Monto" value={compMonto} onChange={e => {
           const v = e.target.value
           setCompMonto(v)
-          const num = parseFloat(v) || 0
-          setCompItbis((Math.round((num * 0.18) * 100) / 100).toFixed(2))
+          const num = parseFloat(v.replace(/,/g, '')) || 0
+          const itbis = Math.round((num * ITBIS_RATE) * 100) / 100
+          setCompItbis(itbis)
         }} />
-        <input className="w-full border rounded px-2 py-1 bg-gray-50" placeholder="ITBIS (18%)" value={compItbis} readOnly />
+        <input className="w-full border rounded px-2 py-1 bg-gray-50" placeholder="ITBIS (18%)" value={typeof compItbis === 'number' ? compItbis.toFixed(2) : compItbis} readOnly />
         {selected ? (
           <div className="w-full text-sm text-gray-700 py-2">Creando comprobante para: <strong>{selected.nombre}</strong> <span className="text-gray-500">({selected.rncCedula})</span></div>
         ) : (

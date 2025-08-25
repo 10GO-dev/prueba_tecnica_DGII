@@ -18,7 +18,12 @@ namespace PruebaTecnica.DGII.Services
 
         public IEnumerable<ComprobanteFiscal> GetByRnc(string rnc) => _repo.GetByRnc(rnc);
 
-        public decimal GetTotalItbis(string rnc) => _repo.GetByRnc(rnc).Sum(c => c.Itbis18);
+        public decimal GetTotalItbis(string rnc)
+        {
+            var items = _repo.GetByRnc(rnc);
+            if (items == null) return 0m;
+            return items.Sum(c => c.Itbis18);
+        }
 
         public void Add(ComprobanteFiscal comprobante)
         {

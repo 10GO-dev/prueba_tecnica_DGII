@@ -3,16 +3,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using PruebaTecnica.DGII.Data;
+using PruebaTecnica.DGII.Repositories;
+using PruebaTecnica.DGII.Interfaces;
+using PruebaTecnica.DGII.Services;
+using PruebaTecnica.DGII.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Register EF repositories for production usage
-builder.Services.AddScoped<PruebaTecnica.DGII.Interfaces.IContribuyenteRepository, PruebaTecnica.DGII.Repositories.ContribuyenteRepository>();
-builder.Services.AddScoped<PruebaTecnica.DGII.Interfaces.IComprobanteRepository, PruebaTecnica.DGII.Repositories.ComprobanteRepository>();
+builder.Services.AddScoped<IContribuyenteRepository, ContribuyenteRepository>();
+builder.Services.AddScoped<IComprobanteRepository, ComprobanteRepository>();
 // Services
-builder.Services.AddScoped<PruebaTecnica.DGII.Services.ContribuyenteService>();
-builder.Services.AddScoped<PruebaTecnica.DGII.Services.ComprobanteService>();
+builder.Services.AddScoped<ContribuyenteService>();
+builder.Services.AddScoped<ComprobanteService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -26,16 +30,21 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var ctx = scope.ServiceProvider.GetRequiredService<PruebaTecnicaContext>();
-    ctx.Database.EnsureCreated();
+    await ctx.Database.EnsureCreatedAsync();
     ctx.EnsureSeedData();
 }
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
+
+// Expose swagger in all environments for easier local testing and QA.
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// Use centralized exception handler from Middleware
+app.UseCustomExceptionHandler();
 
 app.UseRouting();
 app.UseAuthorization();

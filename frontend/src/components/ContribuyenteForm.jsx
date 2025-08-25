@@ -17,8 +17,8 @@ export default function ContribuyenteForm({ onSubmit, values, setters, error }) 
           onChange={e => setNewTipo(e.target.value)}
         >
           <option value="">Selecciona el tipo</option>
-          <option value="activo">PERSONA JURIDICA</option>
-          <option value="inactivo">PERSONA FISICA</option>
+          <option value="PERSONA_JURIDICA">PERSONA JURIDICA</option>
+          <option value="PERSONA_FISICA">PERSONA FISICA</option>
         </select>
         <select
           className="w-full border rounded px-2 py-1"
