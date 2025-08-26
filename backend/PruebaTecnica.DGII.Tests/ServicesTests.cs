@@ -61,20 +61,7 @@ namespace PruebaTecnica.DGII.Tests
             Assert.Equal("JUAN PEREZ", c.Nombre);
         }
 
-        [Fact]
-        public void ContribuyenteService_Add_CreatesContribuyente()
-        {
-            using var ctx = CreateInMemoryContext();
-            var repo = new ContribuyenteRepository(ctx);
-            var service = new ContribuyenteService(repo);
 
-            var newC = new Contribuyente { RncCedula = "555000111", Nombre = "TEST S R L", Tipo = "PERSONA_JURIDICA", Estatus = "activo" };
-            service.Add(newC);
-
-            var found = ctx.Contribuyentes.Find("555000111");
-            Assert.NotNull(found);
-            Assert.Equal("TEST S R L", found.Nombre);
-        }
 
         [Fact]
         public void ComprobanteService_GetTotalItbis_CalculatesCorrectly()
@@ -89,19 +76,6 @@ namespace PruebaTecnica.DGII.Tests
             Assert.Equal(216.00m, total);
         }
 
-        [Fact]
-        public void ComprobanteService_Add_PersistsAndAffectsTotals()
-        {
-            using var ctx = CreateInMemoryContext();
-            var repo = new ComprobanteRepository(ctx);
-            var service = new ComprobanteService(repo);
 
-            var before = service.GetTotalItbis("98754321012");
-            service.Add(new ComprobanteFiscal { RncCedula = "98754321012", NCF = "E310000000009", Monto = 100m });
-            var after = service.GetTotalItbis("98754321012");
-
-            Assert.True(after > before);
-            Assert.Equal(before + (100m * 0.18m), after);
-        }
     }
 }

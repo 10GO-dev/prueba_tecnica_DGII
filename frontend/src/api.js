@@ -12,14 +12,4 @@ export const fetchComprobantesByRnc = async (rnc) => {
   return r.data
 }
 
-export const createContribuyente = async (payload) => {
-  const r = await api.post('/contribuyentes', payload)
-  return r.data
-}
-
-export const createComprobante = async (payload) => {
-  const r = await api.post('/comprobantes', payload)
-  return r.data
-}
-
 export default api

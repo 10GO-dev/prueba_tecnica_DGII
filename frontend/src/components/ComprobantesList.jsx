@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { formatCurrency } from '../utils/formatters'
 
 export default function ComprobantesList({ comprobantes, totalItbis }) {
   return (
@@ -12,12 +13,16 @@ export default function ComprobantesList({ comprobantes, totalItbis }) {
           </thead>
           <tbody>
             {comprobantes.map(cm => (
-              <tr key={cm.ncf} className="border-t"><td className="py-2">{cm.ncf}</td><td>RD${cm.monto}</td><td>RD${cm.itbis18}</td></tr>
+              <tr key={cm.ncf} className="border-t">
+                <td className="py-2">{cm.ncf}</td>
+                <td>{formatCurrency(cm.monto)}</td>
+                <td>{formatCurrency(cm.itbis18)}</td>
+              </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="mt-3">Total ITBIS: <b>{totalItbis}</b></p>
+  <p className="mt-3">Total ITBIS: <b>{formatCurrency(totalItbis)}</b></p>
     </div>
   )
 }
